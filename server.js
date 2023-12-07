@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+//css파일 있는 폴더 등록하기
+app.use(express.static(__dirname + '/public'))
+
 
 // app.listen : 내 컴퓨터 PORT하나 오픈하는 문법
 app.listen(8080,() => {
