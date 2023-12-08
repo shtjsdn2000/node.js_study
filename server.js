@@ -20,8 +20,8 @@ app.get('/first_page',(req,res)=>{
 
 app.get('/news',(req,res)=>{
     //위 주소에 접속하면 db에 저장해보자
-    db.collection('post').insertOne({title : '어쩌구'})
-    // res.send('오늘 비옴')
+    // db.collection('post').insertOne({title : '어쩌구'})
+    res.send('오늘 비옴')
 })
 
 //함수 안에 들어가는 함수를 call back함수라고한다.
@@ -52,4 +52,15 @@ new MongoClient(url).connect().then((client)=>{
 })
 }).catch((err)=>{
     console.log(err)
+})
+
+//ep8. MongoDB에서 데이터 출력하기 (array/object 문법)
+//await db.collection('post').find().toArray()
+//await를 쓰려면 callback 함수앞에 async를 붙여줘야함
+//await : 다음줄 실해하지말고 잠깐 기다려주세요
+//
+app.get('/list',async (req,res)=>{
+    let result =await db.collection('post').find().toArray()
+    console.log(result[0])
+    res.send('DB에 있던 게시물')
 })
