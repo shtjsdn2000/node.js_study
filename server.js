@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 //css파일 있는 폴더 등록하기
 app.use(express.static(__dirname + '/public'))
-
+//ejs 셋팅
+app.set('view engine','ejs') 
 
 
 
@@ -58,9 +59,20 @@ new MongoClient(url).connect().then((client)=>{
 //await db.collection('post').find().toArray()
 //await를 쓰려면 callback 함수앞에 async를 붙여줘야함
 //await : 다음줄 실해하지말고 잠깐 기다려주세요
-//
 app.get('/list',async (req,res)=>{
-    let result =await db.collection('post').find().toArray()
-    console.log(result[0])
-    res.send('DB에 있던 게시물')
+    let result = await db.collection('post').find().toArray()
+    //여기서 result라는 배열 속에 0번째(첫번째) docuent에서 title라는 특정한 키값을 선정
+//ep9.웹페이지에 DB데이터 꽂기 (EJS, 서버사이드 렌더링)
+    //응답은 1개씩만 !~!!
+    //    res.render('list.ejs', {작명 : 전송할 데이터})
+    res.render('list.ejs', { posts : result} ) //posts 안에 result를 보내라
 })
+//클라이언트 사이드 렌더링
+//1. 빈 html파일 + 데이터만 보내고
+//2. 유저 브라우저에서 html 생성해주기
+
+//9강 숙제
+app.get('/time',async(req,res)=>{
+    res.render('time.ejs',{time: new Date()})
+})
+
