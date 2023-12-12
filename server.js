@@ -5,6 +5,10 @@ app.use(express.static(__dirname + '/public'))
 //ejs 셋팅
 app.set('view engine','ejs') 
 
+//req.body를 쓰기위한 코드
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+
 
 
 // 8080port로 들어온 사람들에게 다음과 같은 내용을 보여줄것
@@ -54,11 +58,11 @@ new MongoClient(url).connect().then((client)=>{
 }).catch((err)=>{
     console.log(err)
 })
-
+//-----------------------------------------------------------------------------------
 //ep8. MongoDB에서 데이터 출력하기 (array/object 문법)
 //await db.collection('post').find().toArray()
 //await를 쓰려면 callback 함수앞에 async를 붙여줘야함
-//await : 다음줄 실해하지말고 잠깐 기다려주세요
+//await : 다음줄 실행하지말고 잠깐 기다려주세요
 app.get('/list',async (req,res)=>{
     let result = await db.collection('post').find().toArray()
     //여기서 result라는 배열 속에 0번째(첫번째) docuent에서 title라는 특정한 키값을 선정
@@ -76,3 +80,30 @@ app.get('/time',async(req,res)=>{
     res.render('time.ejs',{time: new Date()})
 })
 
+app.get('/my profile',async(req,res)=>{
+    
+})
+
+
+//11강 notion 참고
+//12강 글 작성기능 만들기 1 (POST 요청)
+
+// 1. 글 작성 페이지에서서 글써서 서버로 전송
+app.get('/write',async(req,res)=>{
+    res.render('write.ejs')
+})
+// 2. 서버는 글을 검사
+//req.vody를 쓰기위해선 상단의 별도의 코드가 필요
+// app.post('/add',(req,res)=>{
+//     console.log(req.body) //유저가 보낸 데이터 출력가능
+// })
+// 3. 이상 없으면 DB에 저장 //오늘의 숙제
+app.post("/add", function (req, res) {
+    console.log(req.body.title);
+    console.log(req.body.content);
+    var title = req.body.title;
+    var content = req.body.content;
+    db.collection('post').insertOne({ 제목 : title, 내용 : content}, function(에러, 결과){
+            console.log('저장완료');
+        });
+    });
