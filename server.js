@@ -42,8 +42,8 @@ app.get('/about',(req,res)=>{
 })
 
 //ep7.MongoDB와 서버 연결하려면
-//MongoDB사용하기 위한 기본 코드임
-const {MongoClient} = require('mongodb');
+//MongoDB사용하기위 한 기본 코드임
+const {MongoClient,ObjectId} = require('mongodb');
 let db;
 //'DB접속URL 만 채우면 DB연결 끝'
 //mongodb+srv://admin:<password>@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority
@@ -127,17 +127,15 @@ if (req.body.title == ''){
 })
 	//중괄호 속 데이터 형식은 object 형식으로 넣어야함
     //서버기능 실행 끝나면 항상 응답 필수})
-// 3. 이상 없으면 DB에 저장 //오늘의 숙제
+    // 3. 이상 없으면 DB에 저장 //오늘의 숙제
 
-/*
-app.post("/add", function (req, res) {
-    console.log(req.body.title);
-    console.log(req.body.content);
-    var title = req.body.title;
-    var content = req.body.content;
-    db.collection('post').insertOne({ 제목 : title, 내용 : content}, function(에러, 결과){
-            console.log('저장완료');
-        });
-    });
-    */
-
+// 14.상세페이지 만들기 1 (URL parameter)
+// ":" 의 의미 유저가 이자리에 아무문자나 입력시
+app.get('/detail/:aaaa',async(req,res)=>{
+    //params
+    
+    // let result = await db.collection('post').findOne({_id : new ObjectId('6572ad9580658447da140f89') })
+    console.log(req.params)
+    res.render('detail.ejs') //유저가 /detatil/8 접속하면 
+    //ID가 8인 글내용 ejs파일로 보내기 
+})
