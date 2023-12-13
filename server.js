@@ -69,7 +69,8 @@ app.get('/list',async (req,res)=>{
 //ep9.웹페이지에 DB데이터 꽂기 (EJS, 서버사이드 렌더링)
     //응답은 1개씩만 !~!!
     //    res.render('list.ejs', {작명 : 전송할 데이터})
-    res.render('list.ejs', { posts : result} ) //posts 안에 result를 보내라
+    res.render('list.ejs', { posts : result}) //posts 안에 result를 보내라
+
 })
 //클라이언트 사이드 렌더링
 //1. 빈 html파일 + 데이터만 보내고
@@ -94,10 +95,41 @@ app.get('/write',async(req,res)=>{
 })
 // 2. 서버는 글을 검사
 //req.vody를 쓰기위해선 상단의 별도의 코드가 필요
-// app.post('/add',(req,res)=>{
-//     console.log(req.body) //유저가 보낸 데이터 출력가능
-// })
+app.post('/add',async(req,res) => {
+//req.body : {title: "글제목" , content : "글내용"} 
+//console.log(req.body) //유저가 보낸 데이터 출력가능
+//13.글 작성기능 만들기 2 (insertOne, 예외 처리)
+//예외처리 구현
+/*
+if (req.body.title == ''){
+    res.send ("제목을 채워주세요")
+ } else {
+   await db.collection('post').insertOne({ title : req.body.title, 
+        content : req.body.content})
+        res.redirect('/list') //redirect 는 원하는 url로 이동
+   }
+*/
+   try{
+//여기코드 실행하고
+    if (req.body.title == ""){
+        res.send ("제목을 채워주세요")
+    } else {
+        await db.collection('post').insertOne({ title : req.body.title, 
+         content : req.body.content})
+        res.redirect('/list') //redirect 는 원하는 url로 이동
+   }
+   }catch(e){
+    //에러뜨면 여기 실행
+    //500은 서버 문제로 생긴 오류 라는 뜻
+    res.status(500).send('서버에러남')
+    console.log(e) // e: 에러메세지 출력해줌
+   }
+})
+	//중괄호 속 데이터 형식은 object 형식으로 넣어야함
+    //서버기능 실행 끝나면 항상 응답 필수})
 // 3. 이상 없으면 DB에 저장 //오늘의 숙제
+
+/*
 app.post("/add", function (req, res) {
     console.log(req.body.title);
     console.log(req.body.content);
@@ -107,3 +139,5 @@ app.post("/add", function (req, res) {
             console.log('저장완료');
         });
     });
+    */
+
