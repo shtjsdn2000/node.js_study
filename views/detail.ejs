@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link href="main.css" rel="stylesheet">
+    <link href="/main.css" rel="stylesheet">
 </head>
 
 <!--input 태그는 form 안에 적어 두는게 좋음-->
 <!--input 태그에 type의 형태에 따라 다양한기능 구현 가능-->
 <body class="grey-bg">
+
     <%- include('nav.ejs') %>
-     <!--서버에 데이터를 주고받을 땐 1.URL 2.method를 정확하게 기입해야함-->
-    <!--<form class="form-box" action ="/URL~~"method="POST">-->
-        <div class="detail-bg">
-            <h4>글제목임</h4>
-            <p>글내용임</p>
-        </div> 
+    
+    <%= JSON.stringify(result) %>
+    <div class="detail-bg">
+        <!--object 자료에서 데이터만 뽑고 싶으면?-->
+        <!--(.)점찍고 자료이름-->
+        <h4><%= result.title %></h4>
+        <p><%= result.content %></p>
+    </div> 
   
   </body>
 </html>

@@ -130,12 +130,28 @@ if (req.body.title == ''){
     // 3. 이상 없으면 DB에 저장 //오늘의 숙제
 
 // 14.상세페이지 만들기 1 (URL parameter)
-// ":" 의 의미 유저가 이자리에 아무문자나 입력시
-app.get('/detail/:aaaa',async(req,res)=>{
-    //params
-    
-    // let result = await db.collection('post').findOne({_id : new ObjectId('6572ad9580658447da140f89') })
-    console.log(req.params)
-    res.render('detail.ejs') //유저가 /detatil/8 접속하면 
-    //ID가 8인 글내용 ejs파일로 보내기 
+// "(:)" 의 의미 유저가 이자리에 아무문자나 입력시 get 요청 인식 후 콜백함수 실행
+// 나의 해답
+/*
+app.get('/detail/:_id',async(req,res)=>{
+    req.params.id = parseInt(req.params.id)
+    db.collection('post').findOne({_id : req.params.id},(err, result)=>{
+        res.render('detail.ejs',{detail : result})
+    })
+})
+*/
+//모법 답안
+//params
+// "(:)" 의 의미 유저가 이자리에 아무문자나 입력시 get 요청 인식 후 콜백함수 실행
+app.get('/detail/:id',async(req,res)=>{
+
+    try{
+    let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id)})
+    console.log(req.params.id)
+    res.render('detail.ejs',{result : result})
+
+}  catch(e){
+    console.log(e) 
+    res.status(404).send('이상한 url 입력함')
+    }
 })
