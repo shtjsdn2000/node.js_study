@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="main.css" rel="stylesheet">
+</head>
+
+<!--input 태그는 form 안에 적어 두는게 좋음-->
+<!--input 태그에 type의 형태에 따라 다양한기능 구현 가능-->
+<body class="grey-bg">
+    <%- include('nav.ejs') %>
+     <!--서버에 데이터를 주고받을 땐 1.URL 2.method를 정확하게 기입해야함-->
+    <!--<form class="form-box" action ="/URL~~"method="POST">-->
+     <form class="form-box" action ="/edit"method="POST">
+        <h4>수정하기</h4>
+        <!--input 안에 값이 서버로 전송될 예정-->
+        <input name = "id" value= "<%= result._id %>" ></input>
+        <input name = "title" value= "<%= result.title %>" ></input>
+        <input name = "content" value="<%= result.content %>"></input>
+        <button type="submit">전송</button>
+    </form> 
+  
+  </body>
+</html>

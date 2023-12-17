@@ -140,6 +140,7 @@ app.get('/detail/:_id',async(req,res)=>{
     })
 })
 */
+// 16.상세페이지 만들기 2 (링크 만들기)
 //모법 답안
 //params
 // "(:)" 의 의미 유저가 이자리에 아무문자나 입력시 get 요청 인식 후 콜백함수 실행
@@ -147,11 +148,30 @@ app.get('/detail/:id',async(req,res)=>{
 
     try{
     let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id)})
-    console.log(req.params.id)
+    console.log(req.params.id) //유저가 글번호를 입력하면 params.id에 저장됨
+    if (result == null){
+        res.status(400).send('이상한 url 입력함')
+    }
     res.render('detail.ejs',{result : result})
-
 }  catch(e){
     console.log(e) 
     res.status(404).send('이상한 url 입력함')
     }
 })
+
+//수정 페이지 만들기
+app.get('/edit/:id', async(req,res)=>{
+
+    result = await db.collection('post').updateOne({_id : new ObjectId(req.params.id)} , 
+    {$set : {title : req.body.title, content : req.body.content} //req.body
+    })
+
+    // let result = await db.collection('post').findOne({ _id : 유저가 URL 파라미터 자리에 입력한 내용}) //post컬렉션 안에 id 가 1인것을 찾아라
+    //유저가 URL 파라미터 자리에 입력한 내용 = req.params
+    let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id)})
+    console.log(result)
+    res.render('edit.ejs',{result : result}) //찾은 데이터를 edit.ejs에 렌더링해라 즉 저기다 띄어라
+})
+
+
+
