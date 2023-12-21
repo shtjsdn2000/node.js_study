@@ -1,8 +1,10 @@
 const { compile } = require('ejs')
 const express = require('express')
 const app = express()
-
+const methodOverride = require('method-override')
 //css파일 있는 폴더 등록하기
+
+app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 //ejs 셋팅
 app.set('view engine','ejs') 
@@ -166,8 +168,18 @@ app.get('/edit/:id', async (req,res)=>{
     res.render('edit.ejs',{result : result})
 }) 
 
-app.post('/edit', async (req,res)=>{
+app.put('/edit', async (req,res)=>{
     await db.collection('post').updateOne({ _id : new ObjectId(req.body.id)},{$set : {title : req.body.title, content : req.body.content}})
     console.log(req.body)
     res.redirect('/list')
 }) 
+
+//document 조작
+
+// app.put('/edit', async (req,res)=>{
+//     //$set : 덮어 쓰라는 뜻
+//     // await db.collection('post').updateOne({ 수정할 document정보 },{$inc : {수정할 내용}}) //inc 기존값에 +/-하라는 뜻
+//     // like > 10 는 다음과 같이 표현 {$gt : 10}
+//     await db.collection('post').updateMany({ like : {$gt : 10} } , {$set : { like : 2 }}
+//         )
+// }) 
