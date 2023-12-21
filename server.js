@@ -1,11 +1,11 @@
 const { compile } = require('ejs')
 const express = require('express')
 const app = express()
+
 //css파일 있는 폴더 등록하기
 app.use(express.static(__dirname + '/public'))
 //ejs 셋팅
 app.set('view engine','ejs') 
-
 //req.body를 쓰기위한 코드
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -160,27 +160,14 @@ app.get('/detail/:id',async(req,res)=>{
     }
 })
 
-//수정 페이지 만들기
-//app.get를 통해 edit.ejs에서 받음
-app.get('/edit/:id', async(req,res)=>{
-    // let result = await db.collection('post').findOne({ _id : 유저가 URL 파라미터 자리에 입력한 내용}) //post컬렉션 안에 id 가 1인것을 찾아라
-    //유저가 URL 파라미터 자리에 입력한 내용 = req.params
-    let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id)}) //167번
+app.get('/edit/:id', async (req,res)=>{
+    let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id) })
     console.log(result)
-    res.render('edit.ejs',{result : result}) //찾은 데이터를 edit.ejs에 렌더링해라 즉 저기다 띄어라
-})
+    res.render('edit.ejs',{result : result})
+}) 
 
-//app.post를 통해 
-app.post('/edit', async(req,res)=> {
-    let  result = await db.collection('post').updateOne({_id: new ObjectId (req.body.id)},
-        {$set : {title : req.body.title, content : req.body.content}}
-        )
+app.post('/edit', async (req,res)=>{
+    await db.collection('post').updateOne({ _id : new ObjectId(req.body.id)},{$set : {title : req.body.title, content : req.body.content}})
     console.log(req.body)
-    console.log(result)       
-    res.redirect('/list') 
-})
-
-
-
-
-
+    res.redirect('/list')
+}) 
