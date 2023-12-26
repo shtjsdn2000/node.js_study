@@ -19,11 +19,30 @@
             <%= posts[i].title %>
         </a>
         <a href = "/edit/<%= posts[i]._id %>">✏️</a>
-      </h4>
-      <p><%= posts[i].content %></p> 
+        <span class="delete">🗑️</span>
+       </h4>
+        <p><%= posts[i].content %></p> 
       </div>
   <%  }  %> 
-    </div> 
-   
+    </div>
+<!---->
+    <!--다음은 AJAX 사용법-->
+<!--기본적인 자바 스크립트 문법-->
+<!--1.스크립트를 작성하고 난 뒤 에 다음과 같은 구절 입력-->
+<!--querySelectorAll : 원하는 HTML요소를 찾음-->
+<!--addEventListener : 클릭시 다음과 같은 코드 실행-->    
+   <script>
+    // "delete라는 클래스명을 가진 여러 html 요소 중 0번째를 찾아서 클릭시 fetch() 실행해라라는 뜻
+    document.querySelectorAll('.delete')[0].addEventListener('click',function(){
+    //fetch GET,POST,PUT,DELETE    
+    // 1.GET: fetch 괄호안에 url을 적으면 해당 URL로 GET요청이 날라감 very easy
+    // 2.POST: 해당 URL을 괄호안에 적고 중괄호를 열고 값을 넣으면 됨 아래 예시
+    fetch('/abc', {
+      method : 'POST',
+      headers : {'Content-Type' : 'applications/json'},
+      body : JSON.stringify({a : 1})
+      })
+    })
+   </script>
   </body>
 </html>

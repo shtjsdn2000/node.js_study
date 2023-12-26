@@ -183,3 +183,8 @@ app.put('/edit', async (req,res)=>{
 //     await db.collection('post').updateMany({ like : {$gt : 10} } , {$set : { like : 2 }}
 //         )
 // }) 
+app.post('/abc',async(req,res)=>{
+
+    console.log('안녕')
+    console.log(req.body)
+})
