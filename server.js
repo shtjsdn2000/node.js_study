@@ -184,6 +184,7 @@ app.put('/edit', async (req,res)=>{
 //         )
 // }) 
 app.delete('/delete',async(req,res)=>{
+    //db에 있던 document
     let result = await db.collection('post').deleteOne({ _id : new ObjectId(req.query.docid)})
     res.send('삭제완료')
 })

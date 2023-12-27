@@ -33,19 +33,31 @@
 <!--querySelectorAll : 원하는 HTML요소를 찾음-->
 <!--addEventListener : 클릭시 다음과 같은 코드 실행-->    
    <script>
+    for (let i = 0; i < '<%= posts.length %>'; i++){
     // "delete라는 클래스명을 가진 여러 html 요소 중 0번째를 찾아서 클릭시 fetch() 실행해라라는 뜻
-    document.querySelectorAll('.delete')[0].addEventListener('click',function(e){
+    document.querySelectorAll('.delete')[i].addEventListener('click',function(e){
     //fetch GET,POST,PUT,DELETE    
     // 1.GET: fetch 괄호안에 url을 적으면 해당 URL로 GET요청이 날라감 very easy
     // 2.POST: 해당 URL을 괄호안에 적고 중괄호를 열고 값을 넣으면 됨 아래 예시
-    fetch('/delete?docid='+ e.target.dataset.id, {
+    fetch('/delete?docid=' + e.target.dataset.id, {
       method : 'DELETE',
       })
+      //21.삭제기능만들기 3
+      //ajax사용시 서버가 보낸 데이터도 출력가능
+      .then((r)=>r.text()) // 서버가 보내는게 문자일 경우 .text
+      .then((r)=>{
+        //parentElement.parentElement : 부모의 부모 요소 즉 글목록 1칸의 div를 말함
+        e.target.parentElement.parentElement.style.display='none'
+      }) 
+      //이쁘게 html만들어서 현재 페이지 보여주세요
+
     })
+  }
     //서버로 데이터 보내는 다른 방법 2가지
     // 1. querystring
     // 2. URLparameter
-  
+
+
    </script>
   </body>
 </html>
