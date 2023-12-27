@@ -183,8 +183,7 @@ app.put('/edit', async (req,res)=>{
 //     await db.collection('post').updateMany({ like : {$gt : 10} } , {$set : { like : 2 }}
 //         )
 // }) 
-app.post('/abc',async(req,res)=>{
-
-    console.log('안녕')
-    console.log(req.body)
+app.delete('/delete',async(req,res)=>{
+    let result = await db.collection('post').deleteOne({ _id : new ObjectId(req.query.docid)})
+    res.send('삭제완료')
 })
