@@ -72,7 +72,7 @@ app.get('/list',async (req,res)=>{
 //ep9.웹페이지에 DB데이터 꽂기 (EJS, 서버사이드 렌더링)
     //응답은 1개씩만 !~!!
     //    res.render('list.ejs', {작명 : 전송할 데이터})
-    res.render('list.ejs', { posts : result}) //posts 안에 result를 보내라
+    res.render('list.ejs', {posts : result}) //posts 안에 result를 보내라
 
 })
 //클라이언트 사이드 렌더링
@@ -188,3 +188,18 @@ app.delete('/delete',async(req,res)=>{
     let result = await db.collection('post').deleteOne({ _id : new ObjectId(req.query.docid)})
     res.send('삭제완료')
 })
+
+app.get('/list/:id',async (req,res) => {
+    let result = await db.collection('post').find()
+        .skip((req.params.id-1)* 5 ).limit(5).toArray()
+        res.render('list.ejs', { posts : result }) 
+
+})
+
+app.get('/list/next/:id', async (req, res) => {
+    let result = await db.collection('post')
+    .find({_id : {$gt : new ObjectId(req.params.id) }})
+    .limit(5).toArray()
+    res.render('list.ejs', { posts : result })
+    console.log(result)
+  }) 

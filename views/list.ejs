@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link href="main.css" rel="stylesheet">
+    <link href="/main.css" rel="stylesheet">
 </head>
 
 <%- include('nav.ejs') %>
@@ -21,12 +21,17 @@
         <a href = "/edit/<%= posts[i]._id %>">✏️</a>
         <span class="delete" data-id="<%= posts[i]._id %>">🗑️</span>
        </h4>
-        <p><%= posts[i].content %></p> 
+        <p><%= posts[i].content %></p>
       </div>
   <%  }  %> 
-    </div>
-<!---->
+</div>
 
+<a href="/list/next/<%= posts[posts.length - 1]._id%>">다음</a>
+
+
+
+<!---->
+ 
     <!--다음은 AJAX 사용법-->
 <!--기본적인 자바 스크립트 문법-->
 <!--1.스크립트를 작성하고 난 뒤 에 다음과 같은 구절 입력-->
@@ -56,8 +61,6 @@
     //서버로 데이터 보내는 다른 방법 2가지
     // 1. querystring
     // 2. URLparameter
-
-
    </script>
   </body>
 </html>
