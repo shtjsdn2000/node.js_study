@@ -25,9 +25,13 @@
       </div>
   <%  }  %> 
 </div>
-
+<% if (posts.length > 0) { %>
 <a href="/list/next/<%= posts[posts.length - 1]._id%>">다음</a>
-
+<a href = "/list/back/">이전</a>
+<%} else {%>
+  <p>게시물이 없습니다.</p>
+  <a href = "/list/back/">이전</a>
+<% } %>
 
 
 <!---->

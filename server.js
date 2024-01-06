@@ -12,7 +12,19 @@ app.set('view engine','ejs')
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+//로그인 기능 구현을 위한 passport라이브러리 기능 구현
+const session = require('express-session')
+const passport = require('passport')
+const LocalStrategy = require('passport-local')
 
+app.use(passport.initialize())
+app.use(session({
+  secret: '암호화에 쓸 비번', //세션의 document id는 암호화 후 유저에게 전송
+  resave : false, //유저가 서버로 요청 할 때마다 세션 갱신할 것인지 false가 일방적
+  saveUninitialized : false //로그인 안해도 세션 만들것인지
+}))
+app.use(passport.session()) 
+//--------------------------
 
 // 8080port로 들어온 사람들에게 다음과 같은 내용을 보여줄것
 
@@ -188,7 +200,7 @@ app.delete('/delete',async(req,res)=>{
     let result = await db.collection('post').deleteOne({ _id : new ObjectId(req.query.docid)})
     res.send('삭제완료')
 })
-
+//#각 번호 별로 
 app.get('/list/:id',async (req,res) => {
     let result = await db.collection('post').find()
         .skip((req.params.id-1)* 5 ).limit(5).toArray()
@@ -203,3 +215,37 @@ app.get('/list/next/:id', async (req, res) => {
     res.render('list.ejs', { posts : result })
     console.log(result)
   }) 
+
+  app.get('/login', async (req, res) => {
+    res.render('login.ejs')
+  }) 
+//---------------
+//passport.authenticate('local')()쓰면 아래 코드 실행
+  passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
+    //제출한 아이디/비번 검사하는 코드 적는 곳
+    //즉 유저가 입력한 아이디 비번이 db에 있는지 대조한다는 것 
+    let result = await db.collection('user').findOne({ username : 입력한아이디})
+   
+    if (!result) {
+      return cb(null, false, { message: '아이디 DB에 없음' })
+    }
+    if (result.password == 입력한비번) {
+      return cb(null, result)
+    } else {
+      return cb(null, false, { message: '비번불일치' });
+    }
+  }))
+  
+  //제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
+  app.post('/login', async (req, res, next) => {
+ //error : 에러시 뭐 들어옴, user : 성공시 뭐 들어옴 info : 실패시 이유
+    passport.authenticate('local',(error, user, info)=>{
+        if (error) return res.status(500).json(error)
+        if (!user) return res.status(401).json(info.message)
+        res.logIn(user, (err)=> {
+        if(err) return next(err)
+        res.redirect('/')  // 로그인 완료시 실행할 코드
+    })
+    })(요청, 응답, next)
+
+}) 
