@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const methodOverride = require('method-override')
 //css파일 있는 폴더 등록하기
-
+const bcrypt = require('bcrypt')
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 //ejs 셋팅
@@ -16,6 +16,7 @@ app.use(express.urlencoded({extended:true}))
 const session = require('express-session')
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const MongoStore = require('connect-mongo')
 
 app.use(passport.initialize())
 app.use(session({
@@ -23,7 +24,11 @@ app.use(session({
   resave : false, //유저가 서버로 요청 할 때마다 세션 갱신할 것인지 false가 일방적
   saveUninitialized : false, //로그인 안해도 세션 만들것인지
   //세션 document 유효기간 변경가능
-  cookie : {maxAge : 60 * 60 * 1000}
+  cookie : {maxAge : 60 * 60 * 1000},
+  store : MongoStore.create({
+    mongoUrl : 'mongodb+srv://admin:qwer1234@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority',
+    dbName : 'forum',
+  })
 }))
 app.use(passport.session()) 
 //--------------------------
@@ -231,6 +236,9 @@ app.get('/list/next/:id', async (req, res) => {
     if (!result) {
       return cb(null, false, { message: '아이디 DB에 없음' })
     }
+    //해쉬된 비번과 안된 비번 비교
+    await bcrypt.compare(입력한비번, result.password)
+    //비번을 db에 있는 비번과 비교
     if (result.password == 입력한비번) {
       return cb(null, result)
     } else {
@@ -275,3 +283,21 @@ app.get('/list/next/:id', async (req, res) => {
     })(req, res, next)
 
 }) 
+
+//가입기능 만들기
+app.get('/register',(req,res)=>{
+    res.render('register.ejs')
+})
+
+app.post('/register',async(req,res)=>{
+//bcrypt 해싱 1번의 1초가 걸림 숫자는 해싱횟수
+let 해시 = await bcrypt.hash(req.body.password,10)
+console.log(해시)
+
+    await db.collection('user').insertOne({
+        username : req.body.username,
+        password : 해시
+    })
+    res.redirect('/')
+
+})
