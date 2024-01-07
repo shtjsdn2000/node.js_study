@@ -21,7 +21,9 @@ app.use(passport.initialize())
 app.use(session({
   secret: '암호화에 쓸 비번', //세션의 document id는 암호화 후 유저에게 전송
   resave : false, //유저가 서버로 요청 할 때마다 세션 갱신할 것인지 false가 일방적
-  saveUninitialized : false //로그인 안해도 세션 만들것인지
+  saveUninitialized : false, //로그인 안해도 세션 만들것인지
+  //세션 document 유효기간 변경가능
+  cookie : {maxAge : 60 * 60 * 1000}
 }))
 app.use(passport.session()) 
 //--------------------------
@@ -219,7 +221,7 @@ app.get('/list/next/:id', async (req, res) => {
   app.get('/login', async (req, res) => {
     res.render('login.ejs')
   }) 
-//---------------
+//--------------------------------------------------------
 //passport.authenticate('local')()쓰면 아래 코드 실행
   passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) => {
     //제출한 아이디/비번 검사하는 코드 적는 곳
@@ -236,16 +238,40 @@ app.get('/list/next/:id', async (req, res) => {
     }
   }))
   
-  //제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
+  passport.serializeUser((user, done) => {
+    console.log(user)
+    process.nextTick(() => { //내부 코드를 비동기적으로 처리해줌
+      done(null, { id: user._id, username: user.username })
+    })
+  })
+
+  //desrializeUser() : 유저가 보낸 쿠키분석
+  passport.deserializeUser(async(user, done) => {
+    let result = await db.collection('user').findOne({_id : new ObjectId(user.id)})
+    delete result.password
+    console.log(user)
+    process.nextTick(() => { //내부 코드를 비동기적으로 처리해줌
+      done(null, result) //이 코드로 인해 req.user를 사용하면 로그인된 유저정보 알려줌
+    })
+  })
+//문제점: 세션 document에 적힌 유저정보를 그대로 req.user에 담아줌
+
+  app.get('/login', async(req,res) => {
+    console.log(req.user)
+    res.render('login.ejs')
+  })
+
+
+//제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
   app.post('/login', async (req, res, next) => {
  //error : 에러시 뭐 들어옴, user : 성공시 뭐 들어옴 info : 실패시 이유
     passport.authenticate('local',(error, user, info)=>{
         if (error) return res.status(500).json(error)
         if (!user) return res.status(401).json(info.message)
-        res.logIn(user, (err)=> {
+        req.logIn(user, (err)=> {
         if(err) return next(err)
-        res.redirect('/')  // 로그인 완료시 실행할 코드
+        res.redirect('/list')  // 로그인 완료시 실행할 코드
     })
-    })(요청, 응답, next)
+    })(req, res, next)
 
 }) 
