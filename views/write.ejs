@@ -13,11 +13,12 @@
     <%- include('nav.ejs') %>
      <!--서버에 데이터를 주고받을 땐 1.URL 2.method를 정확하게 기입해야함-->
     <!--<form class="form-box" action ="/URL~~"method="POST">-->
-     <form class="form-box" action ="/add"method="POST">
+     <form class="form-box" action ="/add"method="POST" enctype="multipart/form-data">
         <h4>글쓰기</h4>
         <!--input 안에 값이 서버로 전송될 예정-->
         <input name = "title">
         <input name = "content">
+        <input type="file" name="img1" accept="image/*" multiple>
         <button type="submit">전송</button>
     </form> 
   

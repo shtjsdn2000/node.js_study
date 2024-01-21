@@ -33,8 +33,31 @@ app.use(session({
   })
 }))
 app.use(passport.session()) 
-//--------------------------
+//---------------------------
+//AWS 셋팅
+const { S3Client } = require('@aws-sdk/client-s3')
+const multer = require('multer')
+const multerS3 = require('multer-s3')
+const s3 = new S3Client({
+  region : 'ap-northeast-2',
+  credentials : {
+      accessKeyId : process.env.S3_KEY,
+      secretAccessKey : process.env.S3_SECRET,
+  }
+})
 
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'shtjsdnforum1',
+    key: function (요청, file, cb) {
+      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+    }
+  })
+})
+//-----------------------------------------------------
+
+//--------------------------
 // 8080port로 들어온 사람들에게 다음과 같은 내용을 보여줄것
 
 //이런 미들웨어는 여러개 삽입 가능
@@ -135,6 +158,9 @@ app.get('/write',async(req,res)=>{
 // 2. 서버는 글을 검사
 //req.vody를 쓰기위해선 상단의 별도의 코드가 필요
 app.post('/add',async(req,res) => {
+  upload.single('img1')(req,res,(err)=>{
+    if (err) return res.send('업로드 에러')
+  })
 //req.body : {title: "글제목" , content : "글내용"} 
 //console.log(req.body) //유저가 보낸 데이터 출력가능
 //13.글 작성기능 만들기 2 (insertOne, 예외 처리)
@@ -154,7 +180,7 @@ if (req.body.title == ''){
         res.send ("제목을 채워주세요")
     } else {
         await db.collection('post').insertOne({ title : req.body.title, 
-         content : req.body.content})
+         content : req.body.content, img : req.file.location})
         res.redirect('/list') //redirect 는 원하는 url로 이동
    }
    }catch(e){
