@@ -4,6 +4,7 @@ const app = express()
 const methodOverride = require('method-override')
 //css파일 있는 폴더 등록하기
 const bcrypt = require('bcrypt')
+const date = new Date();
 require('dotenv').config()
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
@@ -46,7 +47,11 @@ function checkLogin (req, res, next){
 // Q. API 100개에 미들웨어 전부 적용하고 싶다면?
 app.use('/URL',checkLogin)// 여기 밑에 있는 모든 API는 checkLogin 미들웨어 젹용됨
 
-
+function time (req,res,next){
+console.log(date)
+  next()
+}
+app.use('/list',time)
 //html을 띄우는 방법 
 //__dirname : 현재 프로젝트의 절대 경로 라는 뜻
 app.get('/',(요청,응답)=>{
@@ -251,7 +256,7 @@ app.get('/list/next/:id', async (req, res) => {
     //해쉬된 비번과 안된 비번 비교
     await bcrypt.compare(입력한비번, result.password)
     //비번을 db에 있는 비번과 비교
-    if (result.password == 입력한비번) {
+    if (await bcrypt.compare(입력한비번, result.password)) {
       return cb(null, result)
     } else {
       return cb(null, false, { message: '비번불일치' });
@@ -304,7 +309,7 @@ app.post('/login', async (req, res, next) => {
          if (!user) return res.status(401).json(info.message)
          req.logIn(user, (err)=> {
          if(err) return next(err)
-         res.redirect('/mypage')  // 로그인 완료시 실행할 코드
+         res.redirect('/list')  // 로그인 완료시 실행할 코드
      })
      })(req, res, next)
  
@@ -320,11 +325,11 @@ app.post('/register',async(req,res)=>{
 let 해시 = await bcrypt.hash(req.body.password,10)
 console.log(해시)
 
-    await db.collection('user').insertOne({
-        username : req.body.username,
-        password : 해시
-    })
-    res.redirect('/list')
+  await db.collection('user').insertOne({
+      username : req.body.username,
+      password : 해시
+  })
+  res.redirect('/list')
 
 })
 
