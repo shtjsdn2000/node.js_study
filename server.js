@@ -4,6 +4,7 @@ const app = express()
 const methodOverride = require('method-override')
 //css파일 있는 폴더 등록하기
 const bcrypt = require('bcrypt')
+require('dotenv').config()
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 //ejs 셋팅
@@ -20,13 +21,13 @@ const MongoStore = require('connect-mongo')
 
 app.use(passport.initialize())
 app.use(session({
-  secret: '암호화에 쓸 비번', //세션의 document id는 암호화 후 유저에게 전송
+  secret: process.env.PW, //세션의 document id는 암호화 후 유저에게 전송
   resave : false, //유저가 서버로 요청 할 때마다 세션 갱신할 것인지 false가 일방적
   saveUninitialized : false, //로그인 안해도 세션 만들것인지
   //세션 document 유효기간 변경가능
   cookie : {maxAge : 60 * 60 * 1000},
   store : MongoStore.create({
-    mongoUrl : 'mongodb+srv://admin:qwer1234@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority',
+    mongoUrl : process.env.DB_URL,
     dbName : 'forum',
   })
 }))
@@ -34,6 +35,17 @@ app.use(passport.session())
 //--------------------------
 
 // 8080port로 들어온 사람들에게 다음과 같은 내용을 보여줄것
+
+//이런 미들웨어는 여러개 삽입 가능
+function checkLogin (req, res, next){
+  if(!req.user){
+    res.send('로그인하세여') //응답해버리면 남은코드 실행 안됨
+  }
+  next() // next() 가 없으면 함수 무한 반복
+}
+// Q. API 100개에 미들웨어 전부 적용하고 싶다면?
+app.use('/URL',checkLogin)// 여기 밑에 있는 모든 API는 checkLogin 미들웨어 젹용됨
+
 
 //html을 띄우는 방법 
 //__dirname : 현재 프로젝트의 절대 경로 라는 뜻
@@ -69,12 +81,12 @@ const {MongoClient,ObjectId} = require('mongodb');
 let db;
 //'DB접속URL 만 채우면 DB연결 끝'
 //mongodb+srv://admin:<password>@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority
-const url = 'mongodb+srv://admin:qwer1234@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority';
+const url = process.env.DB_URL;
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결성공");
     db = client.db('forum');
     // app.listen : 내 컴퓨터 PORT하나 오픈하는 문법
-    app.listen(8080,() => {
+    app.listen(process.env.PORT,() => {
         console.log('http://localhost:8080에서 서버 실행중')
 })
 }).catch((err)=>{
@@ -270,19 +282,33 @@ app.get('/list/next/:id', async (req, res) => {
   })
 
 
-//제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
-  app.post('/login', async (req, res, next) => {
- //error : 에러시 뭐 들어옴, user : 성공시 뭐 들어옴 info : 실패시 이유
-    passport.authenticate('local',(error, user, info)=>{
-        if (error) return res.status(500).json(error)
-        if (!user) return res.status(401).json(info.message)
-        req.logIn(user, (err)=> {
-        if(err) return next(err)
-        res.redirect('/list')  // 로그인 완료시 실행할 코드
-    })
-    })(req, res, next)
+// //제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
+//   app.post('/login', async (req, res, next) => {
+//  //error : 에러시 뭐 들어옴, user : 성공시 뭐 들어옴 info : 실패시 이유
+//     passport.authenticate('local',(error, user, info)=>{
+//         if (error) return res.status(500).json(error)
+//         if (!user) return res.status(401).json(info.message)
+//         req.logIn(user, (err)=> {
+//         if(err) return next(err)
+//         res.redirect('/list')  // 로그인 완료시 실행할 코드
+//     })
+//     })(req, res, next)
 
-}) 
+// }) 
+
+//제출한 아이디 비번이 DB에 있는지 확인하고 있으면 세션 만들어줌
+app.post('/login', async (req, res, next) => {
+  //error : 에러시 뭐 들어옴, user : 성공시 뭐 들어옴 info : 실패시 이유
+     passport.authenticate('local',(error, user, info)=>{
+         if (error) return res.status(500).json(error)
+         if (!user) return res.status(401).json(info.message)
+         req.logIn(user, (err)=> {
+         if(err) return next(err)
+         res.redirect('/mypage')  // 로그인 완료시 실행할 코드
+     })
+     })(req, res, next)
+ 
+ }) 
 
 //가입기능 만들기
 app.get('/register',(req,res)=>{
@@ -298,6 +324,10 @@ console.log(해시)
         username : req.body.username,
         password : 해시
     })
-    res.redirect('/')
+    res.redirect('/list')
 
+})
+
+app.get('/mypage',(req,res)=>{
+  res.render('mypage.ejs')
 })
