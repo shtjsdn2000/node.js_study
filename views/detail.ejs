@@ -13,12 +13,15 @@
 
     <%- include('nav.ejs') %>
     
-    <%= JSON.stringify(result) %>
     <div class="detail-bg">
         <!--object 자료에서 데이터만 뽑고 싶으면?-->
         <!--(.)점찍고 자료이름-->
+        <div>
         <h4><%= result.title %></h4>
+        </div>
+        <div>
         <p><%= result.content %></p>
+        <p><img src= "https://shtjsdnforum1.s3.ap-northeast-2.amazonaws.com/1706599665589">
     </div> 
   
   </body>

@@ -50,7 +50,7 @@ const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: 'shtjsdnforum1',
-    key: function (요청, file, cb) {
+    key: function (req, file, cb) {
       cb(null, Date.now().toString()) //업로드시 파일명 변경가능
     }
   })
@@ -156,11 +156,35 @@ app.get('/write',async(req,res)=>{
     res.render('write.ejs')
 })
 // 2. 서버는 글을 검사
-//req.vody를 쓰기위해선 상단의 별도의 코드가 필요
+//req.body를 쓰기위해선 상단의 별도의 코드가 필요
 app.post('/add',async(req,res) => {
+
   upload.single('img1')(req,res,(err)=>{
-    if (err) return res.send('업로드 에러')
+    if (err) return res.send('업로드에러')
+    //(이미지 업로드 완료시 실행할 코드 입력 구간)
+    try{
+      //여기코드 실행하고
+          if (req.body.title == ""){
+              res.send ("제목을 채워주세요")
+          } else {
+              db.collection('post').insertOne({ 
+              title : req.body.title, 
+              content : req.body.content, 
+              img : req.file.location
+              })
+              res.redirect('/list') //redirect 는 원하는 url로 이동
+        }
+        }catch(e){
+          //에러뜨면 여기 실행
+          console.log(e) // e: 에러메세지 출력해줌
+          //500은 서버 문제로 생긴 오류 라는 뜻
+          res.status(500).send('서버에러남')
+        }
+  
   })
+
+    
+    
 //req.body : {title: "글제목" , content : "글내용"} 
 //console.log(req.body) //유저가 보낸 데이터 출력가능
 //13.글 작성기능 만들기 2 (insertOne, 예외 처리)
@@ -174,13 +198,17 @@ if (req.body.title == ''){
         res.redirect('/list') //redirect 는 원하는 url로 이동
    }
 */
+/* //on off
    try{
 //여기코드 실행하고
     if (req.body.title == ""){
         res.send ("제목을 채워주세요")
     } else {
-        await db.collection('post').insertOne({ title : req.body.title, 
-         content : req.body.content, img : req.file.location})
+        await db.collection('post').insertOne({ 
+        title : req.body.title, 
+        content : req.body.content, 
+        img : req.file.location
+        })
         res.redirect('/list') //redirect 는 원하는 url로 이동
    }
    }catch(e){
@@ -189,7 +217,10 @@ if (req.body.title == ''){
     res.status(500).send('서버에러남')
     console.log(e) // e: 에러메세지 출력해줌
    }
-})
+*/
+  })
+
+
 	//중괄호 속 데이터 형식은 object 형식으로 넣어야함
     //서버기능 실행 끝나면 항상 응답 필수})
     // 3. 이상 없으면 DB에 저장 //오늘의 숙제
