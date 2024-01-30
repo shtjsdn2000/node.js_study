@@ -106,11 +106,14 @@ app.get('/about',(req,res)=>{
 //ep7.MongoDB와 서버 연결하려면
 //MongoDB사용하기위 한 기본 코드임
 const {MongoClient,ObjectId} = require('mongodb');
+// const connectDB = require('./database.js')
+
+let connectDB = require('./database.js')
+
 let db;
 //'DB접속URL 만 채우면 DB연결 끝'
 //mongodb+srv://admin:<password>@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority
-const url = process.env.DB_URL;
-new MongoClient(url).connect().then((client)=>{
+connectDB.then((client)=>{
     console.log("DB연결성공");
     db = client.db('forum');
     // app.listen : 내 컴퓨터 PORT하나 오픈하는 문법
@@ -393,3 +396,7 @@ console.log(해시)
 app.get('/mypage',(req,res)=>{
   res.render('mypage.ejs')
 })
+
+
+//4.다음과 같이 사용이 가능함
+app.use('/shop', require('./routes/shop.js'))
