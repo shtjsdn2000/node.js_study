@@ -16,6 +16,7 @@ router.get('/shirts', async (req,res)=>{ // 2. app.get --> router.get 으로 수
     res.send('셔츠파는 페이지임')
   })
   
+  
 router.get('/pants',(res,req)=>{
     res.send('바지파는 페이지임')
   })

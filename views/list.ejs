@@ -8,10 +8,14 @@
 
 </head>
 
-<%- include('nav.ejs') %>
 
 
 <body class="grey-bg">
+  <%- include('nav.ejs') %>
+  
+  <input class="search">
+  <button class="search-send">검색</button>
+
     <div class="white-bg">
       <% for (let i = 0; i < posts.length; i++){ %>
       <div class="list-box">
@@ -68,5 +72,16 @@
     // 1. querystring
     // 2. URLparameter
    </script>
+
+<script>
+
+  document.querySelector('.search-send').addEventListener('click', function
+  (){
+    let 입력한거 = document.querySelector('.search').value // input에 입력한 값이 나옴 즉! 찾고자 하는 검색어가 나옴
+    location.href = '/search?val=' + 입력한거 // URL로 이동해 주세요 라는 뜻
+  })
+
+</script>
+
   </body>
 </html>
