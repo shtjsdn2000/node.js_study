@@ -405,7 +405,7 @@ app.use('/shop', require('./routes/shop.js'))
 app.use('/board',require('./routes/board.js'))
 
 app.get('/search',async(req,res)=>{
-  let result = await db.collection('post').find({title :{$regex : req.query.val} }).toArray() //find 속 조건에 해당하는 데이터 전부 가져와라
+  let result = await db.collection('post').find({$text :{$search : req.query.val} }).toArray() //find 속 조건에 해당하는 데이터 전부 가져와라
   res.render('search.ejs',{posts : result})
 })
 
