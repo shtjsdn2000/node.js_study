@@ -405,7 +405,21 @@ app.use('/shop', require('./routes/shop.js'))
 app.use('/board',require('./routes/board.js'))
 
 app.get('/search',async(req,res)=>{
-  let result = await db.collection('post').find({$text :{$search : req.query.val} }).toArray() //find 속 조건에 해당하는 데이터 전부 가져와라
+
+let 검색조건 = [
+  {$search : {
+    index : 'title_index',
+    text : { query : req.query.val, path : 'title' }
+  }},
+  //결과 정렬은 $sort: {필드 : 1}
+  {$sort : {날짜 : 1} },
+  //결과 수 제한은 $limit : 수량 , $skip : 수량 은 스킵
+  //$project 필드 숨기기
+
+]
+
+  //검색할 땐 .find 보다는 .aggregate()
+  let result = await db.collection('post').aggregate(검색조건).toArray() //find 속 조건에 해당하는 데이터 전부 가져와라
   res.render('search.ejs',{posts : result})
 })
 
