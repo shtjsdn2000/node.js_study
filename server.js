@@ -161,7 +161,7 @@ app.get('/write',async(req,res)=>{
 // 2. 서버는 글을 검사
 //req.body를 쓰기위해선 상단의 별도의 코드가 필요
 app.post('/add',async(req,res) => {
-
+console.log(req.user)
   upload.single('img1')(req,res,(err)=>{
     if (err) return res.send('업로드에러')
     //(이미지 업로드 완료시 실행할 코드 입력 구간)
@@ -170,10 +170,13 @@ app.post('/add',async(req,res) => {
           if (req.body.title == ""){
               res.send ("제목을 채워주세요")
           } else {
-              db.collection('post').insertOne({ 
+              db.collection('post').insertOne(
+              { 
               title : req.body.title, 
               content : req.body.content, 
-              img : req.file.location
+              img : req.file ? req.file.location : '', 
+              user : req.user._id,
+              username : req.user.username
               })
               res.redirect('/list') //redirect 는 원하는 url로 이동
         }
@@ -281,7 +284,10 @@ app.put('/edit', async (req,res)=>{
 // }) 
 app.delete('/delete',async(req,res)=>{
     //db에 있던 document
-    let result = await db.collection('post').deleteOne({ _id : new ObjectId(req.query.docid)})
+    let result = await db.collection('post').deleteOne({
+      _id : new ObjectId(req.query.docid),
+      username :new ObjectId(req.user._id)
+    })
     res.send('삭제완료')
 })
 //#각 번호 별로 
