@@ -248,19 +248,10 @@ app.get('/detail/:_id',async(req,res)=>{
 // "(:)" 의 의미 유저가 이자리에 아무문자나 입력시 get 요청 인식 후 콜백함수 실행
 app.get('/detail/:id',async(req,res)=>{
 //댓글 가져오는 기능 구현
-let result2 = await db.collection('comment').find({parentId : new ObjectId(req.params.id)}).toArray()
-    try{
+    let result2 = await db.collection('comment').find({parentId : new ObjectId(req.params.id)}).toArray()
     let result = await db.collection('post').findOne({ _id : new ObjectId(req.params.id)})
-    console.log(req.params.id) //유저가 글번호를 입력하면 params.id에 저장됨
-    if (result == null){
-        res.status(400).send('이상한 url 입력함')
-    }
     res.render('detail.ejs',{result : result, result2 : result2})
-}  catch(e){
-    console.log(e) 
-    res.status(404).send('이상한 url 입력함')
-    }
-
+    console.log(req.params.id) //유저가 글번호를 입력하면 params.id에 저장됨
 
 })
 
@@ -432,9 +423,9 @@ let 검색조건 = [
 })
 
 app.post('/comment',async(req,res)=>{
-  await db.collection('comment').insertOne({
+  let result = await db.collection('comment').insertOne({
     content : req.body.content,
-    writed  : new ObjectId(req.user._id),
+    writerId: new ObjectId(req.user._id),
     writer : req.user.username,
     ParentId : new ObjectId (req.body.parentId)
   })
