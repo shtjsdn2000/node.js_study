@@ -26,6 +26,25 @@
           <input class="chat-input">
           <button class="chat-button">전송</button>
     </div> 
-  
+    <!--웹소켓을 사용해야하는 HTML에다가 다음과 같은 문구를 넣어둠-->
+    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.2/client-dist/socket.io.min.js"></script>
+    <script>
+      const socket = io()
+      //[유저 -> 서버] 데이터 전송은
+      // socket.emit('데이터이름','데이터')
+      socket.emit('ask-join','1')
+
+      //1.버튼누르면 서버에 부탁 //chat
+      document.querySelector('.chat-button').addEventListener('click',
+      function(){
+        socket.emit('message',{msg : '반가워',room : '1'})
+      })
+
+      //데이터 수신하려면 socket.on()
+      socket.on('broadcast',(data)=>{
+        console.log(data)
+      })
+    </script>
+
   </body>
-</html>
+</html> 

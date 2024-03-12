@@ -5,6 +5,14 @@ const methodOverride = require('method-override')
 //css파일 있는 폴더 등록하기
 const bcrypt = require('bcrypt')
 const date = new Date();
+
+//socket.io세팅 문구
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const server = createServer(app)
+const io = new Server(server) 
+
+
 require('dotenv').config()
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
@@ -117,7 +125,7 @@ connectDB.then((client)=>{
     console.log("DB연결성공");
     db = client.db('forum');
     // app.listen : 내 컴퓨터 PORT하나 오픈하는 문법
-    app.listen(process.env.PORT,() => {
+    server.listen(process.env.PORT,() => {
         console.log('http://localhost:8080에서 서버 실행중')
 })
 }).catch((err)=>{
@@ -455,4 +463,32 @@ res.render('chatDetail.ejs', {result : result})
 console.log("chat/detail의 result입니다.",result)
 })
  
- 
+//유저가 웹소켓 연결시 서버에서 코드실행하려면
+ io.on('connection',(socket)=>{
+  console.log("어떤놈이 웹소켓 연결함")
+  //데이터 수신하려면 socket.on()
+  socket.on('age',(data)=>{
+    console.log('유저가 보낸거',data)
+    io.emit('name','kim')
+  })
+//[서버 -> 모든유저]데이터 전송은
+  // io.emit('데이터이름','데이터')
+  //웹소켓은 room 기능있음
+  //유저들 들어갈 수 있는 웹소켓 방
+  //-한 유저는 여러 room에 들어갈 수 있음
+  //-[서버 -> room에 속한 유저] 메세지 전송가능
+
+  //유저를 room으로 보내려면 socket.join(룸이름)
+  socket.on('ask-join',(data)=>{
+  socket.join(data)
+  })
+//Q유저가 특정 룸에 메세지 보내려면?
+// 1. 서버에게 룸에 메세지 전달하라고 부탁
+// 2. 서버는 부탁받으면 룸에 뿌림
+
+//2. 서버는 메세지 수신시 룸에 전달
+  socket.on('message',(data)=>{
+  io.to(data.room).emit('broadcast',data.msg)
+  })
+
+ }) 
