@@ -279,7 +279,7 @@ app.put('/edit', async (req,res)=>{
 app.delete('/delete',async(req,res)=>{
     //db에 있던 document
     let result = await db.collection('post').deleteOne({
-      _id : new ObjectId(req.query.docid),
+_id : new ObjectId(req.query.docid),
       username :new ObjectId(req.user._id)
     })
     res.send('삭제완료')
@@ -431,3 +431,28 @@ app.post('/comment',async(req,res)=>{
   })
   res.redirect('back')
 })
+
+// 채팅방 가져오는 API
+app.get('/chat/request', async(req, res)=>{
+  await db.collection('chatroom').insertOne({
+  member : [req.user._id, new ObjectId(req.query.writerId)],
+  date : new Date()
+  })
+  res.redirect('/chat/list')
+})
+ 
+// 채팅방 목록보여주는 API
+app.get('/chat/list',async(req,res)=>{
+  let result = await db.collection('chatroom').find({member : req.user._id}).toArray() //내가 속한 채팅방들을 DB에서 꺼내서 여기 박아야함
+  res.render('chatList.ejs', {result : result})
+  console.log("chat/list의 result입니다.",result)
+})
+
+// 채팅방 목록보여주는 API
+app.get('/chat/detail/:id',async(req,res)=>{
+let result = await db.collection('chatroom').findOne({ _id : new ObjectId(req.params.id) })
+res.render('chatDetail.ejs', {result : result})
+console.log("chat/detail의 result입니다.",result)
+})
+ 
+ 
