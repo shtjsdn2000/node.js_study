@@ -479,7 +479,8 @@ console.log("chat/detail의 result입니다.",result)
   //-[서버 -> room에 속한 유저] 메세지 전송가능
 
   //유저를 room으로 보내려면 socket.join(룸이름)
-  socket.on('ask-join',(data)=>{
+  socket.on('ask-join',(data)=>{ //chatDetail에서 날라온 정보를 
+  //socket.request.session //로그인된 유저정보
   socket.join(data)
   })
 //Q유저가 특정 룸에 메세지 보내려면?
@@ -487,8 +488,11 @@ console.log("chat/detail의 result입니다.",result)
 // 2. 서버는 부탁받으면 룸에 뿌림
 
 //2. 서버는 메세지 수신시 룸에 전달
-  socket.on('message',(data)=>{
-  io.to(data.room).emit('broadcast',data.msg)
+  socket.on('message-send',(data)=>{
+    //실제 서비스는 socket.io + DB adapter 쓰는게 좋음 //메모리가 아닌 db에 저장함
+    //db에 채팅내용을 저장하는 코드작성 저장요소 (채팅내용, 날짜,부모document, 작성자)
+    //dbcollection~~
+  io.to(data.room).emit('message-broadcast',data.msg)
   })
 
  }) 
