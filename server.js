@@ -496,3 +496,16 @@ console.log("chat/detail의 result입니다.",result)
   })
 
  }) 
+
+ //SSE 구현
+ app.get('/stream/list',(req,res)=>{
+  res.writeHead(200, {
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  });
+  setInterval(()=>{
+  res.write('event: msg\n');
+  res.write('data: 바보\n\n');
+  }, 1000)
+})
