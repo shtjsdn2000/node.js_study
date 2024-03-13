@@ -117,13 +117,18 @@ const {MongoClient,ObjectId} = require('mongodb');
 // const connectDB = require('./database.js')
 
 let connectDB = require('./database.js')
-
 let db;
+let changeStream
 //'DB접속URL 만 채우면 DB연결 끝'
 //mongodb+srv://admin:<password>@cluster0.8vbaxkq.mongodb.net/?retryWrites=true&w=majority
 connectDB.then((client)=>{
     console.log("DB연결성공");
     db = client.db('forum');
+    let 조건 = [ //get요철할 떄마다 실행할 필요는 없을 듯
+  { $match : { operationType : 'insert'} }
+]
+  //change stream 사용법
+  changeStream =  db.collection('post').watch(조건) // 1.postcollection의 변동사항 발생시 알려줌 
     // app.listen : 내 컴퓨터 PORT하나 오픈하는 문법
     server.listen(process.env.PORT,() => {
         console.log('http://localhost:8080에서 서버 실행중')
@@ -504,8 +509,20 @@ console.log("chat/detail의 result입니다.",result)
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
   });
-  setInterval(()=>{
-  res.write('event: msg\n');
-  res.write('data: 바보\n\n');
-  }, 1000)
+  //1초마다 데이터 전송
+  // setInterval(()=>{
+  // res.write('event: msg\n');
+  // res.write('data: 바보\n\n');
+  // }, 1000)
+
+  //insert 되는 경우에만 감지
+
+
+  //change stream 사용법
+  changeStream.on('change',(result)=>{ 
+    console.log(result.fullDocument) //2. 변동사항 발생시 여기가 실행됨
+    res.write('event: msg\n')
+    res.write(`data: ${JSON.stringify(result.fullDocument)}\n\n}`)
+  })
+
 })
